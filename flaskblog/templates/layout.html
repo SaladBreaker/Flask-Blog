@@ -30,13 +30,13 @@
 	      </button>
 	      <div class="collapse navbar-collapse" id="navbarToggle">
 	        <div class="navbar-nav mr-auto">
-	          <a class="nav-item nav-link" href="/">Home</a>
-	          <a class="nav-item nav-link" href="/about">About</a>
+	          <a class="nav-item nav-link" href="{{url_for('home')}}">Home</a>
+	          <a class="nav-item nav-link" href="{{url_for('about')}}">About</a>
 	        </div>
 	        <!-- Navbar Right Side -->
 	        <div class="navbar-nav">
-	          <a class="nav-item nav-link" href="/login">Login</a>
-	          <a class="nav-item nav-link" href="/register">Register</a>
+	          <a class="nav-item nav-link" href="{{url_for('login')}}">Login</a>
+	          <a class="nav-item nav-link" href="{{url_for('register')}}">Register</a>
 	        </div>
 	      </div>
 	    </div>
@@ -48,12 +48,21 @@
 	<main role="main" class="container">
 	  <div class="row">
 	    <div class="col-md-8">
-	      {% block content %}{% endblock %}
+	    	{% with messages = get_flashed_messages(with_categories = true)%}
+	    	{% if messages%}
+	    		{% for category, message in messages %}
+	    			<div class="alert alert-{{ category}}">
+	    				{{ message }}
+	    			</div>
+	    		{% endfor %}
+	    	{% endif %}
+	    	{% endwith%}
+	    	{% block content %}{% endblock %}
 	    </div>
 	    <div class="col-md-4">
 	      <div class="content-section">
 	        <h3>Our Sidebar</h3>
-	        <p class='text-muted'>You can put any information here you'd like.
+	        <p class='text-muted'>Usefull links.
 	          <ul class="list-group">
 	            <li class="list-group-item list-group-item-light">Latest Posts</li>
 	            <li class="list-group-item list-group-item-light">Announcements</li>
