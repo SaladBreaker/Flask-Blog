@@ -1,5 +1,9 @@
-from flaskblog import db 
+from flaskblog import db, login_manager 
 from datetime import datetime 
+
+@login_manager.user_loader
+def load_user(user_id):
+	return User.query.get(int(user_id))
 
 class User(db.Model):
 	id = db.Column(db.Integer, primary_key = True)
@@ -21,4 +25,4 @@ class Post(db.Model):
 	user_id = db.Column(db.Integer, db.ForeignKey('user.id'),nullable = False)
 
 	def __repr__(self):
-		return f"User('{self.title}','{self.date_posted})"
+		return f"User('{self.title}','{self.date_posted}')"
