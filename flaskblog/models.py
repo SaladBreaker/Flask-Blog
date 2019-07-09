@@ -1,6 +1,14 @@
 from flaskblog import db, login_manager 
 from datetime import datetime 
 
+""" 
+Models are used to create the database columns 
+(db.Model) paramether adds the given class to the database
+
+login manager:
+
+"""
+
 @login_manager.user_loader
 def load_user(user_id):
 	return User.query.get(int(user_id))
