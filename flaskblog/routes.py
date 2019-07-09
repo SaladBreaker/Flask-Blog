@@ -1,10 +1,13 @@
-from flask import render_template, url_for, flash, redirect
+from flask import render_template, url_for, flash, redirect, request
 #functions responsible with the management of the pages
 from flaskblog.forms import RegistrationForm, LoginForm
 #form created by us 
 from flaskblog.models import User, Post
 #imports the database fields so we know how to work with it 
 from flaskblog import app, db, bcrypt
+
+from flask_login import login_user, current_user, logout_user, login_required
+
 """
 app is responsible with the routs and keeps track of the files?
 db is the database
@@ -44,6 +47,12 @@ def about():
 #GET is used to give parameters via the path after '?' but does not change them ex: local/username=Vlad
 #POST is the same but changes the actual content ex: local/8080
 def register():
+	#additional checking 
+	if current_user.is_authenticated:
+		flash("User already logged in!",'danger')
+		return redirect(url_for('home'))
+
+
 	form = RegistrationForm()
 	#checks for valid data for the register
 	if form.validate_on_submit():
@@ -57,19 +66,43 @@ def register():
 		db.session.commit()
 		#url_for() returns the html page with the given name
 		return redirect(url_for('login'))
-
 	return render_template('register.html', title='Register', form = form )
+
 
 @app.route("/login",methods = ['GET', 'POST'])
 def login():
+	#additional checking 
+	if current_user.is_authenticated:
+		flash("User already logged in!",'danger')
+		return redirect(url_for('home'))
+
+
 	form = LoginForm()
 	#checks for valid data for the login
 	if form.validate_on_submit():
-			if form.email.data == 'a@gmail.com' and form.password.data == '12345':
-				flash(f'Login succesful for {form.email.data}!','succes')
+		user  = User.query.filter_by(email = form.email.data).first()
+		if user and bcrypt.check_password_hash(user.password, form.password.data):
+			login_user(user, remember = form.remember.data)
+			#gets the next arg if exists /login?user$next=account
+			next_page = request.args.get('next')
+			if not next_page:
 				return redirect(url_for('home'))
 			else:
-				flash('Login unsuccesful!','danger')
-				return redirect(url_for('home'))
+				return redirect(url_for(next_page[1:]))
+		else:
+			flash('Login unsuccesful, check your email and password!','danger')
 	return render_template('login.html', title='Login', form = form )
 
+
+
+@app.route("/logout")
+def logout():
+	#function that log outs user
+	logout_user()
+	return redirect(url_for('home'))
+
+@app.route("/account")
+#login required route set in __init__.py
+@login_required
+def account():
+	return render_template('account.html', title='Account')

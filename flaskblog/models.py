@@ -1,6 +1,6 @@
 from flaskblog import db, login_manager 
 from datetime import datetime 
-
+from flask_login import UserMixin
 """ 
 Models are used to create the database columns 
 (db.Model) paramether adds the given class to the database
@@ -9,11 +9,12 @@ login manager:
 
 """
 
+#decorator
 @login_manager.user_loader
 def load_user(user_id):
 	return User.query.get(int(user_id))
 
-class User(db.Model):
+class User(db.Model, UserMixin):
 	id = db.Column(db.Integer, primary_key = True)
 	username = db.Column(db.String(40), unique=True, nullable = False)
 	email = db.Column(db.String(140), unique=True, nullable = False)
