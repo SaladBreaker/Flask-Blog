@@ -1,6 +1,6 @@
 from flask import render_template, url_for, flash, redirect, request
 #functions responsible with the management of the pages
-from flaskblog.forms import RegistrationForm, LoginForm
+from flaskblog.forms import RegistrationForm, LoginForm, UpdateAccountForm
 #form created by us 
 from flaskblog.models import User, Post
 #imports the database fields so we know how to work with it 
@@ -101,8 +101,21 @@ def logout():
 	logout_user()
 	return redirect(url_for('home'))
 
-@app.route("/account")
+@app.route("/account", methods = ['GET', 'POST'])
 #login required route set in __init__.py
 @login_required
 def account():
-	return render_template('account.html', title='Account')
+	form = UpdateAccountForm()
+	if form.validate_on_submit():
+		#validate on submit check for fct with validate_*
+		current_user.username = form.username.data
+		current_user.email = form.email.data
+		db.session.commit()
+		#Updates the user info
+		flash('Your account info has beem updated!','succes')
+		return redirect(url_for("account"))
+	elif request.method == 'GET':
+		form.username.data = current_user.username
+		form.email.data = current_user.email
+	image_file = url_for('static' , filename='profile_pics/' + current_user.image_file)
+	return render_template('account.html', title='Account', image_file = image_file, form =form)
