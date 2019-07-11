@@ -1,12 +1,14 @@
 from flask import render_template, url_for, flash, redirect, request, abort
 #functions responsible with the management of the pages
-from flaskblog.forms import RegistrationForm, LoginForm, UpdateAccountForm, PostForm
+from flaskblog.forms import RegistrationForm, LoginForm, UpdateAccountForm, PostForm, RequestResetForm, ResetPasswordForm
 #form created by us 
 from flaskblog.models import User, Post
 #imports the database fields so we know how to work with it 
-from flaskblog import app, db, bcrypt
+from flaskblog import app, db, bcrypt, mail
 
 from flask_login import login_user, current_user, logout_user, login_required
+
+from flask_mail import Message
 
 from PIL import  Image
 
@@ -26,7 +28,9 @@ Title = "SynBlog"
 @app.route("/")
 @app.route("/home")
 def home():
-	posts = Post.query.all()
+	page = request.args.get('page', 1, type=int)
+	posts = Post.query.order_by(Post.date_posted.desc()).paginate(page = page,per_page = 5)
+	#used for pagination and order by date desc
 	#render_template(calls the html page with the given parameters)
 	return render_template('home.html',posts=posts, title=Title)
 
@@ -151,7 +155,7 @@ def new_post():
 	return render_template('create_post.html', title='New Post', form=form, legend ="New Post")
 
 
-@app.route("/post/<post_id>")
+@app.route("/post/<int:post_id>")
 #post_id is a var that is the id of a post
 def post(post_id):
 	post = Post.query.get_or_404(post_id)
@@ -159,7 +163,7 @@ def post(post_id):
 	return render_template('post.html', title = post.title, post=post)
 
 
-@app.route("/post/<post_id>/update", methods = ['GET', 'POST'])
+@app.route("/post/<int:post_id>/update", methods = ['GET', 'POST'])
 @login_required
 #post_id is a var that is the id of a post
 def update_post(post_id):
@@ -180,7 +184,7 @@ def update_post(post_id):
 	return render_template('create_post.html', title='Update Post', form=form, legend ="Update Post")
 
 
-@app.route("/post/<post_id>/delete",methods  = ['POST'])
+@app.route("/post/<int:post_id>/delete",methods  = ['POST'])
 @login_required
 #post_id is a var that is the id of a post
 def delete_post(post_id):
@@ -192,3 +196,66 @@ def delete_post(post_id):
 	db.session.commit()
 	flash("Post Deleted!", 'success')
 	return redirect(url_for('home'))
+
+
+@app.route("/user/<string:username>")
+def user_posts(username):
+	page = request.args.get('page', 1, type=int)
+	user = User.query.filter_by(username = username).first_or_404()
+
+	posts = Post.query\
+		.filter_by(author = user)\
+		.order_by(Post.date_posted.desc())\
+		.paginate(page = page,per_page = 5)
+	return render_template('user_post.html',posts=posts, user=user)
+
+
+def send_reset_email(user):
+	token = user.get_reset_token()
+	msg = Message('Password reset request',
+	 			  sender='noreply@demo.com', 
+	 			  recipients=[user.email])
+	print(user.email)
+	msg.body = f"""To reset your password visit: {url_for('reset_token', token =token, _external =True)}
+If you did not make this request please ignore it!
+	"""
+	mail.send(msg)
+
+
+
+
+
+@app.route("/reset_password",methods  = ['GET','POST'])
+def reset_request():
+	if current_user.is_authenticated:
+		flash("User already logged in!",'danger')
+		return redirect(url_for('home'))
+	form = RequestResetForm()
+	if form.validate_on_submit():
+		user = User.query.filter_by(email=form.email.data).first()
+		send_reset_email(user)
+		flash("A reset email was sent!","info")
+		return redirect(url_for("login"))
+
+	return render_template('reset_request.html', title = "Reset Password", form = form)
+
+@app.route("/reset_password/<token>",methods  = ['GET','POST'])
+def reset_token(token):
+	if current_user.is_authenticated:
+		flash("User already logged in!",'danger')
+		return redirect(url_for('home'))
+
+	user = User.verify_reset_token(token)
+	if user is None:
+		flash("Invalid or expired token!","warning")
+		return redirect(url_for("reset_request"))
+
+	form = ResetPasswordForm()
+	if form.validate_on_submit():
+		hashed_password = bcrypt.generate_password_hash(form.password.data).decode('utf-8')
+		flash( f'Account updated!','success' )
+		user.password = hashed_password
+		db.session.commit()
+		return redirect(url_for('login'))
+
+	return render_template('reset_token.html', title = "Reset Passwprd", form = form)

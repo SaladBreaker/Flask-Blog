@@ -2,6 +2,14 @@ from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
 from flask_login import LoginManager
 from flask_bcrypt import Bcrypt
+from flask_mail import Mail
+
+"""
+user SynBlogBot@gmail.com
+pass SynBLog.default
+
+"""
+
 
 app = Flask(__name__)
 app.config['SECRET_KEY'] = "qSrbDdD5vTM4XEiG"
@@ -16,5 +24,12 @@ login_manager.login_view = 'login'
 login_manager.login_message_category = 'info'
 #sets the route for the @login_required and some cathegory
 
+
+app.config['MAIL_SERVER'] = 'smtp.googlemail.com'
+app.config['MAIL_PORT'] = 587
+app.config['MAIL_USE_TLS'] = True
+app.config['MAIL_USERNAME'] = 'SynBlogBot@gmail.com'
+app.config['MAIL_PASSWORD'] = 'SynBlog.default'
+mail = Mail(app)
 
 from flaskblog import routes
