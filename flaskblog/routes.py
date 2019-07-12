@@ -14,9 +14,10 @@ from PIL import  Image
 
 #lib used for randomising
 import secrets
+
 #lib used for getting paths
 import os
-#
+
 
 """
 app is responsible with the routs and keeps track of the files?
@@ -215,7 +216,6 @@ def send_reset_email(user):
 	msg = Message('Password reset request',
 	 			  sender='noreply@demo.com', 
 	 			  recipients=[user.email])
-	print(user.email)
 	msg.body = f"""To reset your password visit: {url_for('reset_token', token =token, _external =True)}
 If you did not make this request please ignore it!
 	"""
