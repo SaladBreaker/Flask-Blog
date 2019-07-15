@@ -16,4 +16,4 @@ Future work:
 - friends list system
 - automated testing system
 
-Also the HTML code and CSS code is mostly copied from: https://github.com/CoreyMSchafer/code_snippets/tree/master/Python/Flask_Blog, all copyright reserved to Corey Schafer. 
+Also the HTML code and CSS code is mostly copied from: https://github.com/CoreyMSchafer/code_snippets/tree/master/Python/Flask_Blog, all copyrights reserved to Corey Schafer. 
