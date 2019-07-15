@@ -1,5 +1,11 @@
+import sys
+sys.path.append('../')
+
 from flaskblog import db
 from flaskblog.models import User, Post
+
+db.create_all()
+
 """
 Useful functions
 

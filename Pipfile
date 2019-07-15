@@ -12,6 +12,7 @@ wtform = "*"
 flask-sqlalchemy = "*"
 pillow = "*"
 flask-mail = "*"
+pytest = "*"
 
 [requires]
 python_version = "3.6"

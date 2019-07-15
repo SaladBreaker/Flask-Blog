@@ -74,7 +74,6 @@ def login():
 		flash("User already logged in!",'danger')
 		return redirect(url_for('home'))
 
-
 	form = LoginForm()
 	#checks for valid data for the login
 	if form.validate_on_submit():
@@ -83,6 +82,7 @@ def login():
 			login_user(user, remember = form.remember.data)
 			#gets the next arg if exists /login?user$next=account
 			next_page = request.args.get('next')
+			flash("User logged in successfully!",'success')
 			if not next_page:
 				return redirect(url_for('home'))
 			else:
@@ -115,7 +115,7 @@ def save_picture(form_picture):
 	i =Image.open(form_picture)
 	i.thumbnail(output_size)
 	#resizing the iamge
-
+	
 	i.save(picture_path)
 	return picture_fn
 
