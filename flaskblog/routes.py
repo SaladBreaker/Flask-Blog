@@ -4,7 +4,7 @@ from flaskblog.forms import RegistrationForm, LoginForm, UpdateAccountForm, Post
 #form created by us 
 from flaskblog.models import User, Post
 #imports the database fields so we know how to work with it 
-from flaskblog import app, db, bcrypt, mail
+from flaskblog import app, db, bcrypt, mail ,csrf
 
 from flask_login import login_user, current_user, logout_user, login_required
 
@@ -68,6 +68,7 @@ def register():
 
 
 @app.route("/login",methods = ['GET', 'POST'])
+@csrf.exempt
 def login():
 	#additional checking 
 	if current_user.is_authenticated:
@@ -76,7 +77,10 @@ def login():
 
 	form = LoginForm()
 	#checks for valid data for the login
+	print("Before validate",form.email.data, form.password.data)
+	#print(form.validate_on_submit())
 	if form.validate_on_submit():
+		print("True validate",form.email.data, form.password.data)
 		user  = User.query.filter_by(email = form.email.data).first()
 		if user and bcrypt.check_password_hash(user.password, form.password.data):
 			login_user(user, remember = form.remember.data)
@@ -89,6 +93,7 @@ def login():
 				return redirect(url_for(next_page[1:]))
 		else:
 			flash('Login unsuccessful, check your email and password!','danger')
+	print("Fasle validate",form.email.data, form.password.data)
 	return render_template('login.html', title='Login', form = form )
 
 
