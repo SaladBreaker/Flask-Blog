@@ -1,23 +1,42 @@
 import sys
 sys.path.append("../")
 from flaskblog import app
-sys.path.append("../flaskblog")
-from forms import LoginForm
 
 
-def test_login(app):
+def test_login():
 	# csrf_token
-	with app.test_request_context('/login'):
-		form_a = LoginForm(
-			formdata=None, 
-			email = "dummy@gmail.com",
-			password = "dummy", 
-			submit="Login"
-			)
+
+	app.config['WTF_CSRF_ENABLED'] = False
+	with app.test_request_context():
 		tester = app.test_client()
-		tester.post(
+		response = tester.post(
 			'/login',
-			data = dict(form_a.data),
-			content_type='multipart/form-data',
+			data = dict(
+				email = "dummy@gmail.com",
+				password = "dummy"
+				),
 			follow_redirects = True)
-	assert False
+	assert b"User logged in successfully!" in response.data
+
+
+
+
+"""def test_login():
+	TESTEMAIL = "dummy@gmail.com"
+	TESTPASS = "dummy"
+	form = LoginForm(
+		formdata = None, 
+		email = "dummy@gmail.com",
+		password = "dummy"
+		)
+	with app.test_request_context():
+		with app.test_client() as c:
+			with c.session_transaction() as sess:
+				sess['email'] = TESTEMAIL
+				sess['password'] = TESTPASS
+				response = c.post(
+					'/login',
+					data = form.data,
+					follow_redirects =True
+					)
+	assert "User logged in successfully!" in response.data"""

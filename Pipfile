@@ -13,6 +13,7 @@ flask-sqlalchemy = "*"
 pillow = "*"
 flask-mail = "*"
 pytest = "*"
+flask-bcrypt = "*"
 
 [requires]
 python_version = "3.6"

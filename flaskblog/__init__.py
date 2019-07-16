@@ -13,6 +13,7 @@ pass SynBLog.default
 
 
 app = Flask(__name__)
+
 app.config['SECRET_KEY'] = "qSrbDdD5vTM4XEiG"
 #set current location of the db in the current dir
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
@@ -32,6 +33,7 @@ app.config['MAIL_PORT'] = 587
 app.config['MAIL_USE_TLS'] = True
 app.config['MAIL_USERNAME'] = 'SynBlogBot@gmail.com'
 app.config['MAIL_PASSWORD'] = 'SynBlog.default'
+
 mail = Mail(app)
 
 csrf = CSRFProtect(app)
