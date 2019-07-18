@@ -4,7 +4,7 @@ from flaskblog.forms import RegistrationForm, LoginForm, UpdateAccountForm, Post
 #form created by us 
 from flaskblog.models import User, Post
 #imports the database fields so we know how to work with it 
-from flaskblog import app, db, bcrypt, mail ,csrf
+from flaskblog import app, db, bcrypt, mail 
 
 from flask_login import login_user, current_user, logout_user, login_required
 
@@ -68,7 +68,6 @@ def register():
 
 
 @app.route("/login",methods = ['GET', 'POST'])
-@csrf.exempt
 def login():
 	#additional checking 
 	if current_user.is_authenticated:
@@ -76,9 +75,8 @@ def login():
 		return redirect(url_for('home'))
 
 	form = LoginForm()
-	print("Before validate",form.email.data,form.password.data)
+
 	#checks for valid data for the login
-	#print(form.validate_on_submit())
 	if form.validate_on_submit():
 		user  = User.query.filter_by(email = form.email.data).first()
 		if user and bcrypt.check_password_hash(user.password, form.password.data):
@@ -92,12 +90,13 @@ def login():
 				return redirect(url_for(next_page[1:]))
 		else:
 			flash('Login unsuccessful, check your email and password!','danger')
-	print("DONT validate",form.email.data,form.password.data)
+
 	return render_template('login.html', title='Login', form = form )
 
 
 
 @app.route("/logout")
+@login_required
 def logout():
 	#function that log outs user
 	logout_user()
@@ -189,7 +188,7 @@ def update_post(post_id):
 	return render_template('create_post.html', title='Update Post', form=form, legend ="Update Post")
 
 
-@app.route("/post/<int:post_id>/delete",methods  = ['POST'])
+@app.route("/post/<int:post_id>/delete",methods  = ['POST','GET'])
 @login_required
 #post_id is a var that is the id of a post
 def delete_post(post_id):

@@ -3,7 +3,6 @@ from flask_sqlalchemy import SQLAlchemy
 from flask_login import LoginManager
 from flask_bcrypt import Bcrypt
 from flask_mail import Mail
-from flask_wtf.csrf import CSRFProtect
 
 """
 user SynBlogBot@gmail.com
@@ -36,6 +35,5 @@ app.config['MAIL_PASSWORD'] = 'SynBlog.default'
 
 mail = Mail(app)
 
-csrf = CSRFProtect(app)
 
 from flaskblog import routes
