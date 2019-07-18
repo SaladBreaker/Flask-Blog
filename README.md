@@ -14,6 +14,5 @@ app.config['MAIL_PASSWORD'] = 'yourpassword'
 Future work:
 - shortcuts on sidebar
 - friends list system
-- automated testing system
 
 Also the HTML code and CSS code is mostly copied from: https://github.com/CoreyMSchafer/code_snippets/tree/master/Python/Flask_Blog, all copyrights reserved to Corey Schafer. 
