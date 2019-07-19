@@ -14,6 +14,7 @@ pillow = "*"
 flask-mail = "*"
 pytest = "*"
 flask-bcrypt = "*"
+flask-testing = "*"
 
 [requires]
 python_version = "3.6"

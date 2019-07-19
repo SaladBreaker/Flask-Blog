@@ -1,80 +1,43 @@
-"""import sys
 
-sys.path.append("../")
-from flaskblog import app
+from fixtures import user, client, configed_app, login, logout, post
 
-from test_manage_users import get_a_user_from_the_db, give_id_for_testing_post
+from flask_login import current_user, user_logged_in
 
-
-def test_logged_user_can_access_urlfor_account(get_a_user_from_the_db):	
-
-	app.config['WTF_CSRF_ENABLED'] = False
-
-	user = get_a_user_from_the_db
-	with app.test_request_context():
-		tester = app.test_client()
-
-		response = tester.post(
-			'/login',
-			data = dict(
-				email = user.email,
-				password = user.password,
-				),
-			follow_redirects = True
-			)
-
-		response = tester.get(
+def test_logged_user_can_access_account(user,client,configed_app):	
+	with configed_app.test_request_context():
+		print(user.is_anonymous)
+		response = login
+		print(user.is_anonymous)
+		response = client.get(
 			'/account',
-			follow_redirects = True
+			follow_redirects = False
 			)
-	assert b"Please log in to access this page."  not in response.data 
+		user_logged_in
+	assert b"Please log dsain tso access this page."   in response.data 
 
 
-def test_logged_user_can_access_urlfor_logout(get_a_user_from_the_db):	
+"""
+def test_logged_user_can_access_logout(user,client,configed_app,login,logout):	
+	with configed_app.test_request_context():
+		response = login
+		response = logout
+	assert response.status_code == 302
 
-	app.config['WTF_CSRF_ENABLED'] = False
 
-	user = get_a_user_from_the_db
-	with app.test_request_context():
-		tester = app.test_client()
+def test_logged_user_can_access_post_delete(user,client,configed_app,login,post):	
+	with configed_app.test_request_context():
+		id = str(post.getId())
+		logout
 
-		response = tester.post(
-			'/login',
-			data = dict(
-				email = user.email,
-				password = user.password,
-				),
-			follow_redirects = True
-			)
-
-		response = tester.get(
-			'/logout',
-			follow_redirects = True
-			)
-	assert b"Please log in to access this page."  not in response.data 
-
-def test_logged_user_can_access_urlfor_post_delete(get_a_user_from_the_db):	
-	id = give_id_for_testing_post()
-	app.config['WTF_CSRF_ENABLED'] = False
-
-	user = get_a_user_from_the_db
-	with app.test_request_context():
-		tester = app.test_client()
-
-		response = tester.post(
-			'/login',
-			data = dict(
-				email = user.email,
-				password = user.password,
-				),
-			follow_redirects = True
-			)
-
-		response = tester.get(
+		#response = login
+		print(user.is_authenticated)
+		user.logout
+		response = client.get(
 			'/post/' + id +'/delete',
-			follow_redirects = True
-			)
-	assert b"Please log in to access this page."  not in response.data 
+			follow_redirects = False)
+
+	assert response.status_code == 403
+
 
 def test_logged_user_can_access_urlfor_post_update(get_a_user_from_the_db):	
 	id = give_id_for_testing_post()

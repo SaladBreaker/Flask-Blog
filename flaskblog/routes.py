@@ -168,9 +168,10 @@ def post(post_id):
 
 
 @app.route("/post/<int:post_id>/update", methods = ['GET', 'POST'])
-@login_required
 #post_id is a var that is the id of a post
 def update_post(post_id):
+	if not current_user.is_authenticated:
+		abort(403)
 	post = Post.query.get_or_404(post_id)
 	if post.author != current_user:
 		#403 - forbitten route
@@ -189,10 +190,12 @@ def update_post(post_id):
 
 
 @app.route("/post/<int:post_id>/delete",methods  = ['POST','GET'])
-@login_required
 #post_id is a var that is the id of a post
 def delete_post(post_id):
+	if not current_user.is_authenticated:
+		abort(403)
 	post = Post.query.get_or_404(post_id)
+	print(current_user.username, current_user.password, current_user)
 	if post.author != current_user:
 		#403 - forbitten route
 		abort(403)
