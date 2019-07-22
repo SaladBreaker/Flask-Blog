@@ -1,66 +1,60 @@
 
-from fixtures import user, client, configed_app, login, logout, post
+from fixtures import client, configed_app, logout, post, user
 
-def test_logged_user_can_access_account(user,client,configed_app,login):	
+def test_logout_user_can_not_access_account(client,configed_app):	
 	with configed_app.test_request_context():
-		response = login
 
 		response = client.get(
 			'/account',
 			follow_redirects = False
 			)
 
-	assert response.status_code == 200
+	assert response.status_code == 403
 
 
-def test_logged_user_can_access_logout(user,client,configed_app,login,logout):	
+def test_logout_user_can_not_access_logout(client,configed_app,user,logout):	
 	with configed_app.test_request_context():
-		response = login
 		response = logout
 
-	assert response.status_code == 302
+	assert response.status_code == 403
 
 
-def test_logged_user_can_access_post_delete(user,client,configed_app,login,post):	
+def test_logout_user_can_not_access_post_delete(client,configed_app,post):	
 	with configed_app.test_request_context():
 		id = str(post.getId())
-		response = login
 
 		response = client.get(
 			'/post/' + id +'/delete',
 			follow_redirects = False
 			)
 
-	assert response.status_code == 302
+	assert response.status_code == 403
 
 
-def test_logged_user_can_access_post_update(user,client,configed_app,login,post):	
+def test_logout_user_can_not_access_post_update(client,configed_app,post):	
 	with configed_app.test_request_context():
 		id = str(post.getId())
-		response = login
 
 		response = client.get(
 			'/post/' + id +'/update',
 			follow_redirects = False)
 
-	assert response.status_code == 200
+	assert response.status_code == 403
 
-def test_logged_user_can_access_post_new(user,client,configed_app,login,post):	
+def test_logout_user_can_not_access_post_new(client,configed_app,post):	
 	with configed_app.test_request_context():
 		id = str(post.getId())
-		response = login
 
 		response = client.get(
 			'/post/new',
 			follow_redirects = False)
 
-	assert response.status_code == 200
+	assert response.status_code == 403
 
 
-def test_logged_user_can_access_home_page(user,client,configed_app,login,post):	
+def test_logout_user_can_access_home_page(client,configed_app,post):	
 	with configed_app.test_request_context():
 		id = str(post.getId())
-		response = login
 
 		response = client.get(
 			'/home',
@@ -68,10 +62,9 @@ def test_logged_user_can_access_home_page(user,client,configed_app,login,post):
 
 	assert response.status_code == 200
 
-def test_logged_user_can_access_post_id(user,client,configed_app,login,post):	
+def test_logout_user_can_access_post_id(client,configed_app,post):	
 	with configed_app.test_request_context():
 		id = str(post.getId())
-		response = login
 
 		response = client.get(
 			'/post/'+ id ,
@@ -79,10 +72,9 @@ def test_logged_user_can_access_post_id(user,client,configed_app,login,post):
 
 	assert response.status_code == 200
 
-def test_logged_user_can_access_user_posts(user,client,configed_app,login,post):	
+def test_logout_user_can_access_user_posts(client,configed_app,post):	
 	with configed_app.test_request_context():
 		id = str(post.getId())
-		response = login
 
 		response = client.get(
 			'/user/test1' ,

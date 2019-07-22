@@ -84,7 +84,6 @@ def login(client,user):
 def logout(user, client):
 	response = client.get(
 		'/logout',
-		data = user,
 		follow_redirects = False
 		)
 	return response
@@ -109,3 +108,8 @@ def delete_user(user = None):
 		User.query.filter_by(email = user.email).delete()
 	else:
 		assert user != none, "Trying to delete None object instead of user obj"
+
+
+def get_posts_from_db(user):
+	posts = Post.query.filter_by(author = user).all()
+	return posts

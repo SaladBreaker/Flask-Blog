@@ -24,6 +24,12 @@ app is responsible with the routs and keeps track of the files?
 db is the database
 bcrypt is an object that has the hashing functions
 """
+
+def restrict_if_not_logged():
+	if not current_user.is_authenticated:
+		abort(403)
+
+
 Title = "SynBlog"
 
 @app.route("/")
@@ -96,8 +102,10 @@ def login():
 
 
 @app.route("/logout")
-@login_required
+#@login_required
 def logout():
+	restrict_if_not_logged()
+
 	#function that log outs user
 	logout_user()
 	return redirect(url_for('home'))
@@ -106,9 +114,11 @@ def logout():
 
 
 def save_picture(form_picture):
+
 	#use random name to the photo so there are no duplicates
 	random_hex = secrets.token_hex(8)
 	_, f_ext = os.path.splitext(form_picture.filename)
+
 	picture_fn = random_hex + f_ext
 	#gets the file extension and sets the name <random>.png or jpg
 	picture_path = os.path.join(app.root_path, 'static/profile_pics', picture_fn)
@@ -124,84 +134,105 @@ def save_picture(form_picture):
 
 @app.route("/account", methods = ['GET', 'POST'])
 #login required route set in __init__.py
-@login_required
+#@login_required
 def account():
+	restrict_if_not_logged()
+
 	form = UpdateAccountForm()
 	if form.validate_on_submit():
 		if form.picture.data:
 			picture_name = save_picture(form.picture.data)
 			current_user.image_file = picture_name
-		#validate on submit check for fct with validate_*
+			#validate on submit check for fct with validate_*
+
 		current_user.username = form.username.data
 		current_user.email = form.email.data
 		db.session.commit()
 		#Updates the user info
+
 		flash('Your account info has been updated!','success')
 		return redirect(url_for("account"))
+
 	elif request.method == 'GET':
 		form.username.data = current_user.username
 		form.email.data = current_user.email
+
 	image_file = url_for('static' , filename='profile_pics/' + current_user.image_file)
 	return render_template('account.html', title='Account', image_file = image_file, form =form)
 
 
 
 @app.route("/post/new", methods = ['GET', 'POST'])
-@login_required
+#@login_required
 def new_post():
+	restrict_if_not_logged()
+
 	form = PostForm()
+
 	if form.validate_on_submit():
 		post = Post(title = form.title.data, content = form.content.data, author = current_user)
 		db.session.add(post)
 		db.session.commit()
+
 		flash("Good post!","success")
 		return redirect(url_for('home'))
+
 	return render_template('create_post.html', title='New Post', form=form, legend ="New Post")
 
 
 @app.route("/post/<int:post_id>")
 #post_id is a var that is the id of a post
 def post(post_id):
+
 	post = Post.query.get_or_404(post_id)
 	#gets post or gives error
+	
 	return render_template('post.html', title = post.title, post=post)
 
 
 @app.route("/post/<int:post_id>/update", methods = ['GET', 'POST'])
 #post_id is a var that is the id of a post
 def update_post(post_id):
-	if not current_user.is_authenticated:
-		abort(403)
+	restrict_if_not_logged()
+
 	post = Post.query.get_or_404(post_id)
 	if post.author != current_user:
 		#403 - forbitten route
 		abort(403)
+
 	form = PostForm()
 	if form.validate_on_submit():
 		post.title = form.title.data
 		post.content = form.content.data
 		db.session.commit()
+
 		flash("Post Updated!", 'success')
 		return redirect(url_for('post',post_id=post.id))
+	
 	elif request.method == 'GET':
 		form.title.data = post.title 
 		form.content.data = post.content
+
 	return render_template('create_post.html', title='Update Post', form=form, legend ="Update Post")
 
 
 @app.route("/post/<int:post_id>/delete",methods  = ['POST','GET'])
 #post_id is a var that is the id of a post
+#@login_required
 def delete_post(post_id):
-	if not current_user.is_authenticated:
-		abort(403)
+	restrict_if_not_logged()
+
 	post = Post.query.get_or_404(post_id)
 	print(current_user.username, current_user.password, current_user)
+
 	if post.author != current_user:
 		#403 - forbitten route
 		abort(403)
+
 	db.session.delete(post)
 	db.session.commit()
 	flash("Post Deleted!", 'success')
+
 	return redirect(url_for('home'))
 
 
@@ -222,31 +253,33 @@ def send_reset_email(user):
 	msg = Message('Password reset request',
 	 			  sender='noreply@demo.com', 
 	 			  recipients=[user.email])
+
 	msg.body = f"""To reset your password visit: {url_for('reset_token', token =token, _external =True)}
 If you did not make this request please ignore it!
 	"""
 	mail.send(msg)
 
 
-
-
-
 @app.route("/reset_password",methods  = ['GET','POST'])
 def reset_request():
+	
 	if current_user.is_authenticated:
 		flash("User already logged in!",'danger')
 		return redirect(url_for('home'))
+
 	form = RequestResetForm()
 	if form.validate_on_submit():
 		user = User.query.filter_by(email=form.email.data).first()
 		send_reset_email(user)
 		flash("A reset email was sent!","info")
+
 		return redirect(url_for("login"))
 
 	return render_template('reset_request.html', title = "Reset Password", form = form)
 
 @app.route("/reset_password/<token>",methods  = ['GET','POST'])
 def reset_token(token):
+
 	if current_user.is_authenticated:
 		flash("User already logged in!",'danger')
 		return redirect(url_for('home'))
@@ -260,8 +293,9 @@ def reset_token(token):
 	if form.validate_on_submit():
 		hashed_password = bcrypt.generate_password_hash(form.password.data).decode('utf-8')
 		flash( f'Account updated!','success' )
+
 		user.password = hashed_password
 		db.session.commit()
 		return redirect(url_for('login'))
 
-	return render_template('reset_token.html', title = "Reset Passwprd", form = form)
+	return render_template('reset_token.html', title = "Reset Password", form = form)
