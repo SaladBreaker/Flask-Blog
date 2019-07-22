@@ -29,19 +29,29 @@ import secrets
 import os
 
 
+import functools
+
 """
 app is responsible with the routs and keeps track of the files?
 db is the database
 bcrypt is an object that has the hashing functions
 """
 
-
-def required_login():
-    if not current_user.is_authenticated:
-        abort(403)
-
-
 Title = "SynBlog"
+
+
+def required_login(func):
+    @functools.wraps(func)
+    def wrapper(post_id=-1):
+        if not current_user.is_authenticated:
+            abort(403)
+
+        if post_id != -1:
+            return func(post_id)
+        else:
+            return func()
+
+    return wrapper
 
 
 @app.route("/")
@@ -83,8 +93,15 @@ def register():
         user = User(
             username=form.username.data, email=form.email.data, password=hashed_password
         )
-        db.session.add(user)
-        db.session.commit()
+
+        try:
+            db.session.add(user)
+            db.session.commit()
+
+        except Exception as e:
+            flash("Unexpected error at registering. Please try again!", "danger")
+            return redirect(url_for("register"))
+
         # url_for() returns the html page with the given name
         return redirect(url_for("login"))
     return render_template("register.html", title="Register", form=form)
@@ -118,9 +135,8 @@ def login():
 
 
 @app.route("/logout")
-# @login_required
+@required_login
 def logout():
-    required_login()
 
     # function that log outs user
     logout_user()
@@ -148,10 +164,8 @@ def save_picture(form_picture):
 
 
 @app.route("/account", methods=["GET", "POST"])
-# login required route set in __init__.py
-# @login_required
+@required_login
 def account():
-    required_login()
 
     form = UpdateAccountForm()
     if form.validate_on_submit():
@@ -160,10 +174,14 @@ def account():
             current_user.image_file = picture_name
             # validate on submit check for fct with validate_*
 
-        current_user.username = form.username.data
-        current_user.email = form.email.data
-        db.session.commit()
         # Updates the user info
+        try:
+            current_user.username = form.username.data
+            current_user.email = form.email.data
+            db.session.commit()
+        except Exception as e:
+            flash("Unexpected error at updating info. Please try again!", "danger")
+            return redirect(url_for("account"))
 
         flash("Your account info has been updated!", "success")
         return redirect(url_for("account"))
@@ -179,9 +197,8 @@ def account():
 
 
 @app.route("/post/new", methods=["GET", "POST"])
-# @login_required
+@required_login
 def new_post():
-    required_login()
 
     form = PostForm()
 
@@ -189,8 +206,13 @@ def new_post():
         post = Post(
             title=form.title.data, content=form.content.data, author=current_user
         )
-        db.session.add(post)
-        db.session.commit()
+        try:
+            db.session.add(post)
+            db.session.commit()
+
+        except Exception as e:
+            flash("Unexpected error at creating post. Please try again!", "danger")
+            return redirect(url_for("new_post"))
 
         flash("Good post!", "success")
         return redirect(url_for("home"))
@@ -201,7 +223,6 @@ def new_post():
 
 
 @app.route("/post/<int:post_id>")
-# post_id is a var that is the id of a post
 def post(post_id):
 
     post = Post.query.get_or_404(post_id)
@@ -211,9 +232,8 @@ def post(post_id):
 
 
 @app.route("/post/<int:post_id>/update", methods=["GET", "POST"])
-# post_id is a var that is the id of a post
+@required_login
 def update_post(post_id):
-    required_login()
 
     post = Post.query.get_or_404(post_id)
     if post.author != current_user:
@@ -224,7 +244,13 @@ def update_post(post_id):
     if form.validate_on_submit():
         post.title = form.title.data
         post.content = form.content.data
-        db.session.commit()
+
+        try:
+            db.session.commit()
+
+        except Exception as e:
+            flash("Unexpected error at updating post. Please try again!", "danger")
+            return redirect(url_for("update_post", post_id))
 
         flash("Post Updated!", "success")
         return redirect(url_for("post", post_id=post.id))
@@ -239,10 +265,8 @@ def update_post(post_id):
 
 
 @app.route("/post/<int:post_id>/delete", methods=["POST", "GET"])
-# post_id is a var that is the id of a post
-# @login_required
+@required_login
 def delete_post(post_id):
-    required_login()
 
     post = Post.query.get_or_404(post_id)
     print(current_user.username, current_user.password, current_user)
@@ -251,8 +275,13 @@ def delete_post(post_id):
         # 403 - forbitten route
         abort(403)
 
-    db.session.delete(post)
-    db.session.commit()
+    try:
+        db.session.delete(post)
+        db.session.commit()
+    except Exception as e:
+        flash("Unexpected error at deleting post. Please try again!", "danger")
+        return redirect(url_for("home"))
+
     flash("Post Deleted!", "success")
 
     return redirect(url_for("home"))
@@ -293,7 +322,14 @@ def reset_request():
     form = RequestResetForm()
     if form.validate_on_submit():
         user = User.query.filter_by(email=form.email.data).first()
-        send_reset_email(user)
+
+        try:
+            send_reset_email(user)
+
+        except Exception as e:
+            flash("Unexpected error at sending mail. Please try again!", "danger")
+            return redirect(url_for("register"))
+
         flash("A reset email was sent!", "info")
 
         return redirect(url_for("login"))

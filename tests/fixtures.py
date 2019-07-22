@@ -24,8 +24,7 @@ def post():
         db.session.add(user)
         db.session.commit()
 
-    if user == None:
-        assert False, "Error at adding a dummy user for testing"
+    assert user != None, "Error at adding a dummy user for testing"
 
     posts = user.getPosts()
     if len(posts) == 0:
@@ -33,6 +32,9 @@ def post():
         db.session.add(post)
         db.session.commit()
         return post
+
+    assert posts != None, "Error at adding a dummy post for testing"
+
     return posts[0]
 
 
@@ -44,21 +46,18 @@ def configed_app():
 
 @pytest.fixture
 def client(configed_app):
-    client = configed_app.test_client()
-    return client
+    return configed_app.test_client()
 
 
 @pytest.fixture
 def user():
-    user = User(username="test1", email="test1@gmail.com", password="test1")
-    return user
+    return User(username="test1", email="test1@gmail.com", password="test1")
 
 
 @pytest.fixture
 def new_user():
     txt = random_string()
-    new_user = User(username=txt, email=txt + "@gmail.com", password=txt)
-    return new_user
+    return User(username=txt, email=txt + "@gmail.com", password=txt)
 
 
 @pytest.fixture
@@ -68,12 +67,18 @@ def login(client, user):
         data=dict(email=user.email, password=user.password),
         follow_redirects=True,
     )
+
+    assert response.status_code == 200, "Login fixture failed"
+
     return response
 
 
 @pytest.fixture
 def logout(user, client):
     response = client.get("/logout", follow_redirects=False)
+    assert (
+        response.status_code == 302 or response.status_code == 403
+    ), "Logout fixture failed"
     return response
 
 
@@ -90,7 +95,8 @@ def register(client, new_user):
         ),
         follow_redirects=False,
     )
-    return response
+
+    assert response.status_code == 200, "Register fixture failed"
 
 
 def delete_user(user=None):
@@ -101,5 +107,5 @@ def delete_user(user=None):
 
 
 def get_posts_from_db(user):
-    posts = Post.query.filter_by(author=user).all()
-    return posts
+    assert db != None, "Inexistent db"
+    return Post.query.filter_by(author=user).all()
