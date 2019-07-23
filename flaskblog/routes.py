@@ -57,6 +57,7 @@ def required_login(func):
 @app.route("/")
 @app.route("/home")
 def home():
+    print(request.remote_addr)
     page = request.args.get("page", 1, type=int)
     posts = Post.query.order_by(Post.date_posted.desc()).paginate(page=page, per_page=5)
     # used for pagination and order by date desc

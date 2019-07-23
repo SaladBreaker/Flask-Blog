@@ -1,4 +1,4 @@
-from fixtures import new_user, delete_user, configed_app, client
+from fixtures import new_user, configed_app, client, delete_user
 
 
 def test_register_succesful_for_correct_credentials(new_user, configed_app, client):
@@ -14,8 +14,7 @@ def test_register_succesful_for_correct_credentials(new_user, configed_app, clie
             follow_redirects=False,
         )
     assert response.status_code == 302, (
-        "User didn't register with correct credentials. Status code: "
-        + str(response.status_code)
+        "User didn't register with correct credentials. Status code: {response.status_code}"
     )
     delete_user(new_user)
 
@@ -35,8 +34,7 @@ def test_register_unsuccesful_for_missing_confirm_password(
             follow_redirects=False,
         )
     assert response.status_code == 200, (
-        "User register with missing confirm password. Status code: "
-        + str(response.status_code)
+        "User register with missing confirm password. Status code: {response.status_code}"
     )
     delete_user(new_user)
 
@@ -55,7 +53,7 @@ def test_register_unsuccesful_for_missing_password(new_user, configed_app, clien
         )
     assert (
         response.status_code == 200
-    ), "User register with missing password. Status code: " + str(response.status_code)
+    ), "User register with missing password. Status code: {response.status_code}"
     delete_user(new_user)
 
 
@@ -73,7 +71,7 @@ def test_register_unsuccesful_for_missing_email(new_user, configed_app, client):
         )
     assert (
         response.status_code == 200
-    ), "User register with missing email. Status code: " + str(response.status_code)
+    ), "User register with missing email. Status code: {response.status_code}"
     delete_user(new_user)
 
 
@@ -91,7 +89,7 @@ def test_register_unsuccesful_for_missing_username(new_user, configed_app, clien
         )
     assert (
         response.status_code == 200
-    ), "User register with missing username. Status code: " + str(response.status_code)
+    ), "User register with missing username. Status code: {response.status_code}"
     delete_user(new_user)
 
 
@@ -109,7 +107,7 @@ def test_register_unsuccesful_for_big_username(new_user, configed_app, client):
         )
     assert (
         response.status_code == 200
-    ), "User register with big username. Status code: " + str(response.status_code)
+    ), "User register with big username. Status code: {response.status_code}"
     delete_user(new_user)
 
 
@@ -128,7 +126,6 @@ def test_register_unsuccesful_for_different_pass_and_conf_pass(
             follow_redirects=False,
         )
     assert response.status_code == 200, (
-        "User register with different password and confirm password. Status code: "
-        + str(response.status_code)
+        "User register with different password and confirm password. Status code: {response.status_code}"
     )
     delete_user(new_user)
