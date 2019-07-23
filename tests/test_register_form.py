@@ -13,9 +13,9 @@ def test_register_succesful_for_correct_credentials(new_user, configed_app, clie
             ),
             follow_redirects=False,
         )
-    assert response.status_code == 302, (
-        "User didn't register with correct credentials. Status code: {response.status_code}"
-    )
+    assert (
+        response.status_code == 302
+    ), "User didn't register with correct credentials. Status code: {response.status_code}"
     delete_user(new_user)
 
 
@@ -33,9 +33,9 @@ def test_register_unsuccesful_for_missing_confirm_password(
             ),
             follow_redirects=False,
         )
-    assert response.status_code == 200, (
-        "User register with missing confirm password. Status code: {response.status_code}"
-    )
+    assert (
+        response.status_code == 200
+    ), "User register with missing confirm password. Status code: {response.status_code}"
     delete_user(new_user)
 
 
@@ -125,7 +125,7 @@ def test_register_unsuccesful_for_different_pass_and_conf_pass(
             ),
             follow_redirects=False,
         )
-    assert response.status_code == 200, (
-        "User register with different password and confirm password. Status code: {response.status_code}"
-    )
+    assert (
+        response.status_code == 200
+    ), "User register with different password and confirm password. Status code: {response.status_code}"
     delete_user(new_user)
