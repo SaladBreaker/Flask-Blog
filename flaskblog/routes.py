@@ -1,11 +1,4 @@
-from flask import (
-    render_template, 
-    url_for, 
-    flash, 
-    redirect, 
-    request, 
-    abort
-)
+from flask import render_template, url_for, flash, redirect, request, abort
 
 from flaskblog.forms import (
     RegistrationForm,
@@ -165,17 +158,29 @@ def logout():
 
 
 def save_picture(form_picture):
-    random_hex = secrets.token_hex(8)
-    _, f_ext = os.path.splitext(form_picture.filename)
 
-    picture_fn = random_hex + f_ext
-    picture_path = os.path.join(app.root_path, "static/profile_pics", picture_fn)
+    try:
+        random_hex = secrets.token_hex(8)
+        _, f_ext = os.path.splitext(form_picture.filename)
 
-    output_size = (125, 125)
-    i = Image.open(form_picture)
-    i.thumbnail(output_size)
+        picture_fn = random_hex + f_ext
+        picture_path = os.path.join(app.root_path, "static/profile_pics", picture_fn)
 
-    i.save(picture_path)
+        output_size = (125, 125)
+        i = Image.open(form_picture)
+        i.thumbnail(output_size)
+
+        i.save(picture_path)
+
+    except Exception as e:
+        logger.warning(
+            f"Could not save Photo. User: {user.email}. IP: {request.remote_addr}"
+        )
+        flash("Unexpected error at saving photo. Please try again!", "danger")
+        redirect(url_for("home"))
+
+        return redirect(url_for("register"))
+
     logger.debug(
         f"Photo saved successfully for: {current_user.email}. IP: {request.remote_addr}"
     )

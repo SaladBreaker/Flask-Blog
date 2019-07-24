@@ -1,10 +1,16 @@
 import sys
+import os
 
-sys.path.append("../")
-from flaskblog import app, db
+if os.getcwd().split("\\")[-1] != "WebAPP":
+    sys.path.append("../")
+    from flaskblog import app, db
 
-sys.path.append("../")
-from flaskblog.models import User, Post
+    sys.path.append("../")
+    from flaskblog.models import User, Post
+else:
+    from flaskblog import app, db
+    from flaskblog.models import User, Post
+
 import pytest
 import random
 import string
