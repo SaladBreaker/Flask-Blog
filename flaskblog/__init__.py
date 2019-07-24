@@ -9,13 +9,13 @@ user SynBlogBot@gmail.com
 pass SynBLog.default
 
 """
-
 import logging
 
 logger = logging.getLogger(__name__)
-logger.setLevel(logging.INFO)
+logger.setLevel(logging.DEBUG)
 formatter = logging.Formatter("[%(asctime)s -- %(name)s] %(message)s")
-file_handler = logging.FileHandler("../logs/init.log")
+file_handler = logging.FileHandler("logs/events.log")
+#file_handler = logging.StreamHandler()
 file_handler.setFormatter(formatter)
 logger.addHandler(file_handler)
 
@@ -47,5 +47,7 @@ logger.info(f"Login manager created successfully!")
 
 mail = Mail(app)
 logger.info(f"Mail sender created successfully!")
+
+
 
 from flaskblog import routes

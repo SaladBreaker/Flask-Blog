@@ -1,4 +1,11 @@
-from flask import render_template, url_for, flash, redirect, request, abort
+from flask import (
+    render_template, 
+    url_for, 
+    flash, 
+    redirect, 
+    request, 
+    abort
+)
 
 from flaskblog.forms import (
     RegistrationForm,
@@ -10,29 +17,18 @@ from flaskblog.forms import (
 )
 
 from flaskblog.models import User, Post
-
 from flaskblog import app, db, bcrypt, mail
-
 from flask_login import login_user, current_user, logout_user
 
 from flask_mail import Message
-
 from PIL import Image
-
 import secrets
 
 import os
-
 import functools
-
 import logging
 
 logger = logging.getLogger(__name__)
-logger.setLevel(logging.DEBUG)
-formatter = logging.Formatter("[%(asctime)s -- %(name)s] %(message)s")
-file_handler = logging.FileHandler("../logs/routes.log")
-file_handler.setFormatter(formatter)
-logger.addHandler(file_handler)
 
 Title = "SynBlog"
 
@@ -71,9 +67,14 @@ def home():
 
 @app.route("/about")
 def about():
-    logger.debug(
-        f"About page accessed successfully. User: {current_user.email}. IP: {request.remote_addr}"
-    )
+    if current_user.is_authenticated:
+        logger.debug(
+            f"About page accessed successfully. User: {current_user.email}. IP: {request.remote_addr}"
+        )
+    else:
+        logger.debug(
+            f"About page accessed successfully. User: Unknown. IP: {request.remote_addr}"
+        )
     return render_template("about.html", title=Title)
 
 
@@ -156,8 +157,9 @@ def login():
 @app.route("/logout")
 @required_login
 def logout():
+    email = current_user.email
     logout_user()
-    logger.debug(f"User log out successfully! IP: {request.remote_addr}")
+    logger.debug(f"User log out successfully. User:{email}  IP: {request.remote_addr}")
 
     return redirect(url_for("home"))
 

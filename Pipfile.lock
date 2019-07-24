@@ -1,7 +1,7 @@
 {
     "_meta": {
         "hash": {
-            "sha256": "6166df85e1b54fc52c78a6806291598d72cad9c0e84b4f17e05e0d3d6547b63d"
+            "sha256": "64be8a400e536c6faebca69eb0a203ca1fa64a8e486b178e916ebe180c646de9"
         },
         "pipfile-spec": 6,
         "requires": {
@@ -16,6 +16,13 @@
         ]
     },
     "default": {
+        "appdirs": {
+            "hashes": [
+                "sha256:9e5896d1372858f8dd3344faf4e5014d21849c756c8d5701f78f8a103b372d92",
+                "sha256:d8b24664561d0d34ddfaec54636d502d7cea6e29c3eaf68f3df6180863e2166e"
+            ],
+            "version": "==1.4.3"
+        },
         "atomicwrites": {
             "hashes": [
                 "sha256:03472c30eb2c5d1ba9227e4c2ca66ab8287fbfbbda3888aa93dc2e28fc6811b4",
@@ -50,6 +57,14 @@
                 "sha256:ff032765bb8716d9387fd5376d987a937254b0619eff0972779515b5c98820bc"
             ],
             "version": "==3.1.7"
+        },
+        "black": {
+            "hashes": [
+                "sha256:09a9dcb7c46ed496a9850b76e4e825d6049ecd38b611f1224857a79bd985a8cf",
+                "sha256:68950ffd4d9169716bcb8719a56c07a2f4485354fec061cdd5910aa07369731c"
+            ],
+            "index": "pypi",
+            "version": "==19.3b0"
         },
         "blinker": {
             "hashes": [
@@ -272,10 +287,10 @@
         },
         "pyparsing": {
             "hashes": [
-                "sha256:530d8bf8cc93a34019d08142593cf4d78a05c890da8cf87ffa3120af53772238",
-                "sha256:f78e99616b6f1a4745c0580e170251ef1bbafc0d0513e270c4bd281bf29d2800"
+                "sha256:1873c03321fc118f4e9746baf201ff990ceb915f433f23b395f5580d1840cb2a",
+                "sha256:9b6323ef4ab914af344ba97510e966d64ba91055d6b9afa6b30799340e89cc03"
             ],
-            "version": "==2.4.1"
+            "version": "==2.4.0"
         },
         "pytest": {
             "hashes": [
@@ -297,6 +312,13 @@
                 "sha256:217e7fc52199a05851eee9b6a0883190743c4fb9c8ac4313ccfceaffd852b0ff"
             ],
             "version": "==1.3.6"
+        },
+        "toml": {
+            "hashes": [
+                "sha256:229f81c57791a41d65e399fc06bf0848bab550a9dfd5ed66df18ce5f05e73d5c",
+                "sha256:235682dd292d5899d361a811df37e04a8828a5b1da3115886b73cf81ebc9100e"
+            ],
+            "version": "==0.10.0"
         },
         "wcwidth": {
             "hashes": [

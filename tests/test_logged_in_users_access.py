@@ -74,3 +74,12 @@ def test_logged_user_can_access_user_posts(client, configed_app, login):
     assert (
         response.status_code == 200
     ), f"Logged user does not have access user's posts. Status code: {response.status_code}"
+
+
+def test_logged_user_can_access_about(client, configed_app, login):
+    with configed_app.test_request_context():
+        response = client.get("/about", follow_redirects=False)
+
+    assert (
+        response.status_code == 200
+    ), f"Logged user does not have access to about page. Status code: {response.status_code}"

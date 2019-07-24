@@ -15,7 +15,7 @@ flask-mail = "*"
 pytest = "*"
 flask-bcrypt = "*"
 flask-testing = "*"
-black = "*"
+black = "==19.3b0"
 
 [requires]
 python_version = "3.6"
