@@ -15,6 +15,4 @@ Future work:
 - shortcuts on sidebar
 - friends list system
 
-For testing you have to run the "pipenv run pytest" command  from inside the tests file because of the sys.path.append() function 
-
 Also the HTML code and CSS code is mostly copied from: https://github.com/CoreyMSchafer/code_snippets/tree/master/Python/Flask_Blog, all copyrights reserved to Corey Schafer. 
