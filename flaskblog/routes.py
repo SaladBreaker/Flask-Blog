@@ -123,7 +123,20 @@ def login():
 
     form = LoginForm()
     if form.validate_on_submit():
-        user = User.query.filter_by(email=form.email.data).first()
+
+        try:
+            user = User.query.filter_by(email=form.email.data).first()
+
+        except:
+            logger.warning(
+                f"Could not search in database. User: {form.email.data}. IP: {request.remote_addr}"
+            )
+            flash(
+                "Unexpected error at searching in database. Redirected to home.",
+                "danger",
+            )
+            redirect(url_for(home))
+
         if user and bcrypt.check_password_hash(user.password, form.password.data):
 
             login_user(user, remember=form.remember.data)
@@ -174,7 +187,7 @@ def save_picture(form_picture):
 
     except Exception as e:
         logger.warning(
-            f"Could not save Photo. User: {user.email}. IP: {request.remote_addr}"
+            f"Could not save Photo. User: {user.email}. IP: {request.remote_addr}. Error: {e}"
         )
         flash("Unexpected error at saving photo. Please try again!", "danger")
         redirect(url_for("home"))
@@ -203,7 +216,7 @@ def account():
             db.session.commit()
         except Exception as e:
             logger.warning(
-                f"CAn not update info for: {current_user.email}. IP: {request.remote_addr}"
+                f"CAn not update info for: {current_user.email}. IP: {request.remote_addr}. Error: {e}"
             )
             flash("Unexpected error at updating info. Please try again!", "danger")
             return redirect(url_for("account"))
@@ -239,7 +252,7 @@ def new_post():
 
         except Exception as e:
             logger.warning(
-                f"Could not create post: { form.title.data }, user: {current_user.email}. IP: {request.remote_addr}"
+                f"Could not create post: { form.title.data }, user: {current_user.email}. IP: {request.remote_addr}. Error: {e}"
             )
             flash("Unexpected error at creating post. Please try again!", "danger")
             return redirect(url_for("new_post"))
@@ -293,7 +306,7 @@ def update_post(post_id):
 
         except Exception as e:
             logger.warning(
-                f"Could not update post: {current_user.email} post id:{post.getId()}. IP: {request.remote_addr}"
+                f"Could not update post: {current_user.email} post id:{post.getId()}. IP: {request.remote_addr}. Error: {e}"
             )
             flash("Unexpected error at updating post. Please try again!", "danger")
             return redirect(url_for("update_post", post_id))
@@ -330,7 +343,7 @@ def delete_post(post_id):
         db.session.commit()
     except Exception as e:
         logger.warning(
-            f"Could not delete post. Post id:{post.getId()}, user: {current_user.email}. IP: {request.remote_addr}"
+            f"Could not delete post. Post id:{post.getId()}, user: {current_user.email}. IP: {request.remote_addr}. Error: {e}"
         )
         flash("Unexpected error at deleting post. Please try again!", "danger")
         return redirect(url_for("home"))
@@ -345,7 +358,17 @@ def delete_post(post_id):
 @app.route("/user/<string:username>")
 def user_posts(username):
     page = request.args.get("page", 1, type=int)
-    user = User.query.filter_by(username=username).first_or_404()
+    try:
+        user = User.query.filter_by(username=username).first_or_404()
+
+    except:
+        logger.warning(
+            f"Could not search in database. User: {form.email.data}. IP: {request.remote_addr}"
+        )
+        flash(
+            "Unexpected error at searching in database. Redirected to home.", "danger"
+        )
+        redirect(url_for(home))
 
     posts = (
         Post.query.filter_by(author=user)
@@ -378,7 +401,7 @@ def send_reset_email(user):
         mail.send(msg)
     except Exception as e:
         logger.warning(
-            f"Could not send recovery email to: { user.mail }. IP: {request.remote_addr}"
+            f"Could not send recovery email to: { user.mail }. IP: {request.remote_addr}. Error: {e}"
         )
 
 
@@ -394,7 +417,19 @@ def reset_request():
 
     form = RequestResetForm()
     if form.validate_on_submit():
-        user = User.query.filter_by(email=form.email.data).first()
+
+        try:
+            user = User.query.filter_by(email=form.email.data).first()
+
+        except:
+            logger.warning(
+                f"Could not search in database. User: {form.email.data}. IP: {request.remote_addr}"
+            )
+            flash(
+                "Unexpected error at searching in database. Redirected to home.",
+                "danger",
+            )
+            redirect(url_for(home))
 
         try:
             send_reset_email(user)
@@ -402,7 +437,7 @@ def reset_request():
         except Exception as e:
             flash("Unexpected error at sending mail. Please try again!", "danger")
             logger.warning(
-                f"Mail could not be sent. User: {user.email}. IP: {request.remote_addr}"
+                f"Mail could not be sent. User: {user.email}. IP: {request.remote_addr}. Error: {e}"
             )
             return redirect(url_for("register"))
 
@@ -448,7 +483,7 @@ def reset_token(token):
         except Exception as e:
             flash("Unexpected error at validating token. Please try again!", "danger")
             logger.warning(
-                f"Token could not be validated. User: {user.email}. IP: {request.remote_addr}"
+                f"Token could not be validated. User: {user.email}. IP: {request.remote_addr}. Error: {e}"
             )
             return redirect(url_for("home"))
 

@@ -1,10 +1,11 @@
 from flask_wtf import FlaskForm
 from flask_wtf.file import FileField, FileAllowed
 from flask_login import current_user
+
 from wtforms import StringField, TextAreaField, PasswordField, SubmitField, BooleanField
 
-# parameters gotten from the html forum
 from wtforms.validators import DataRequired, Length, Email, EqualTo, ValidationError
+
 from flaskblog.models import User
 
 

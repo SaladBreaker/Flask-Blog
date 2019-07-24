@@ -8,7 +8,10 @@ if os.getcwd().split("\\")[-1] != "WebAPP":
     sys.path.append("../")
     from flaskblog.models import User, Post
 else:
+    sys.path.append("../WebAPP")
     from flaskblog import app, db
+
+    sys.path.append("../WebAPP")
     from flaskblog.models import User, Post
 
 import pytest
