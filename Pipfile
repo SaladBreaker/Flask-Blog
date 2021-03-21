@@ -4,6 +4,8 @@ url = "https://pypi.org/simple"
 verify_ssl = true
 
 [dev-packages]
+jinja2 = ">=2.11.3"
+Pillow = ">=8.1.1"
 
 [packages]
 flask = "*"
